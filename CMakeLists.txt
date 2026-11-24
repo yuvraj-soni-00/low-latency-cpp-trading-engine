@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(order_book STATIC
     src/order_book.cpp
+    src/matching_engine.cpp
 )
 target_include_directories(order_book
     PUBLIC
@@ -31,14 +32,4 @@ target_compile_options(trading_engine PRIVATE
     -Wall
     -Wextra
     -Wpedantic
-)
-
-add_executable(order_book_tests
-    test/order_book_tests.cpp
-    src/order_book.cpp
-)
-
-target_include_directories(order_book_tests
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
 )

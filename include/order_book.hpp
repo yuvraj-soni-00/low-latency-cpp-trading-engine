@@ -17,8 +17,9 @@ namespace trading{
         std::map<Price, std::list<Order>, std::greater<Price>> bids_;
         std::map<Price, std::list<Order>> asks_;
         std::unordered_map<OrderId, Orderloc> order_index;
-        bool is_valid_order(const Order& order) const;
         public:
+
+        bool is_valid_order(const Order& order) const;
 
         bool add_order(const Order& order);
         bool cancel_order(OrderId order_id);
@@ -39,5 +40,13 @@ namespace trading{
 
         Quantity best_bid_quantity() const;
         Quantity best_ask_quantity() const;
+
+        std::optional<Order> best_bid_order() const;
+        std::optional<Order> best_ask_order() const;
+
+        bool reduce_order_quant(OrderId orderId, Quantity quant);
+
+        friend class Engine;
+
     };
 };

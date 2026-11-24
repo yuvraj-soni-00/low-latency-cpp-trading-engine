@@ -144,5 +144,43 @@ namespace trading{
         return order_index.empty();
     }
 
+    std::optional<Order> OrderBook::best_bid_order() const{
+        if (bids_.empty()) return std::nullopt;
+        return bids_.begin()->second.front();
+    }
+
+    std::optional<Order> OrderBook::best_ask_order() const{
+        if (asks_.empty()) return std::nullopt;
+        return asks_.begin()->second.front();
+    }
+
+    bool OrderBook::reduce_order_quant(OrderId orderId, Quantity quant){
+        if (quant == 0) return false;
+        auto order_ind = order_index.find(orderId);
+
+        if (order_ind==order_index.end()) return false;
+        auto & order_it = order_ind->second.order_iter;
+
+        if (order_it->quantity < quant) return false;
+
+        if (order_it->quantity==quant){
+            Price price = order_it->price;
+            if(order_it->side==Side::Buy){
+                auto& level = bids_[price];
+                level.erase(order_it);
+                if (level.empty()) bids_.erase(price);
+            }
+            else{
+                auto& level = asks_[price];
+                level.erase(order_it);
+                if (level.empty()) asks_.erase(price);
+            }
+            order_index.erase(orderId);
+        }
+        else{
+            order_it->quantity -= quant;
+        }
+        return true; 
+    }
 }
     
