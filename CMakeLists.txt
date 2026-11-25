@@ -57,9 +57,26 @@ target_link_libraries(order_book_tests
         trading_core
         GTest::gtest_main
 )
-
 include(GoogleTest)
-gtest_discover_tests(order_book_tests)
+gtest_discover_tests(
+    order_book_tests
+    PROPERTIES LABELS "unit"    
+)
+
+
+add_executable(matching_engine_tests
+    test/matching_engine_tests.cpp
+)
+target_link_libraries(matching_engine_tests
+    PRIVATE
+    trading_core
+    GTest::gtest_main
+)
+include(GoogleTest)
+gtest_discover_tests(
+    matching_engine_tests
+    PROPERTIES LABELS "integration"
+)
 
 # Error functions for every compilation target
 function(enable_project_warnings target_name)
