@@ -12,31 +12,30 @@ option(
 )
 
 if(ENABLE_SANITIZERS)
-
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-
         add_compile_options(
             -fsanitize=address,undefined
             -fno-omit-frame-pointer
             -g
             -O1
         )
-
         add_link_options(
             -fsanitize=address,undefined
         )
-
     else()
         message(FATAL_ERROR "Sanitizers are not configured for this compiler")
     endif()
-
+else()
+    # Apply static linking only when sanitizers are OFF
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        add_link_options(-static-libgcc -static-libstdc++ -static)
+    endif()
 endif()
 
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++ -static")
 
 # Gtest setup
 include(FetchContent)
@@ -131,3 +130,4 @@ endfunction()
 enable_project_warnings(trading_core)
 enable_project_warnings(trading_engine)
 enable_project_warnings(order_book_tests)
+enable_project_warnings(matching_engine_tests)
