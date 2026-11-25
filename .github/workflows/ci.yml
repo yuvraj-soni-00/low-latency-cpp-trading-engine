@@ -12,33 +12,60 @@ permissions:
   contents: read 
 
 jobs: 
-  build_and_test:
-    
-    name: Build and test
   
-    runs-on: ubuntu-latest
+  build_and_test:
+    name: Build and Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
-      
-      
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Check tools
-        run: |
-          g++ --version
-          cmake --version
-        
-      - name: Configure Cmake
+      - name: Check CMake
+        run: cmake --version
+
+      - name: Check GCC
+        if: runner.os == 'Linux'
+        run: g++ --version
+
+      - name: Configure CMake
         run: |
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build project
         run: |
-          cmake --build build --parallel 2
+          cmake --build build --config Debug --parallel 2
 
-      - name: Run test
+      - name: Run tests
         run: |
-          ctest --test-dir build --output-on-failure
+          ctest --test-dir build -C Debug --output-on-failure
+
       
-    
+
+
+  sanitizers:
+    name: ASan and UBSan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Configure with sanitizers
+        run: |
+          cmake -S . -B build-sanitized \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DENABLE_SANITIZERS=ON
+
+      - name: Build with sanitizers
+        run: |
+          cmake --build build-sanitized --parallel 2
+
+      - name: Run sanitizer tests
+        run: |
+          ctest --test-dir build-sanitized --output-on-failure

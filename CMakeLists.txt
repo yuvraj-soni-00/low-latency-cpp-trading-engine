@@ -5,6 +5,34 @@ project(low_latency_trading_engine
     LANGUAGES CXX
 )
 
+option(
+    ENABLE_SANITIZERS
+    "Enable AddressSanitizer and UndefinedBehaviorSanitizer"
+    OFF
+)
+
+if(ENABLE_SANITIZERS)
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+
+        add_compile_options(
+            -fsanitize=address,undefined
+            -fno-omit-frame-pointer
+            -g
+            -O1
+        )
+
+        add_link_options(
+            -fsanitize=address,undefined
+        )
+
+    else()
+        message(FATAL_ERROR "Sanitizers are not configured for this compiler")
+    endif()
+
+endif()
+
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
