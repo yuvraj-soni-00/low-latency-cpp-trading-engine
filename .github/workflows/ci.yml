@@ -1,0 +1,44 @@
+name: C++ Trading Engine CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  
+  workflow_dispatch:
+
+permissions:
+  contents: read 
+
+jobs: 
+  build_and_test:
+    
+    name: Build and test
+  
+    runs-on: ubuntu-latest
+
+    steps:
+      
+      
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check tools
+        run: |
+          g++ version
+          cmake version
+        
+      - name: Configure Cmake
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build and compile
+        run: |
+          cmake --build build --parallel 2
+
+      - name: Run test
+        run: |
+          ctest --test-dir build --output-on-failure
+      
+    
